@@ -11,6 +11,7 @@ typedef enum _QUERY_TYPE
     MQ_MANAGER,              // 消息队列管理器对象
     LOG_MANAGER,             // 日志管理器对象
     STORAGE_MANAGER,         // 存储管理器对象
+    EVENT_MANAGER,           // 事件管理器对象
 } QUERY_TYPE;
 
 class IContext

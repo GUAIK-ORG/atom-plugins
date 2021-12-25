@@ -22,6 +22,11 @@ MainWidget::MainWidget(IContext* ctx, QWidget *parent)
         aDebug() << "registerMessageHandler success";
         mq->registerMessageHandler("test-mq", this);
     }
+    IEventManager* eventManager;
+    if (0 == m_ctx->query(QUERY_TYPE::EVENT_MANAGER, (void**)&eventManager)) {
+        m_switchWidgetEvent = new EVENT_OBJ(10, this);
+        eventManager->registerEventHandler(EVENT_ID::SWITCH_WIDGET, m_switchWidgetEvent);
+    }
 
     QHBoxLayout* mainLayout = new QHBoxLayout();
 
@@ -108,6 +113,15 @@ MainWidget::MainWidget(IContext* ctx, QWidget *parent)
     this->setLayout(mainLayout);
 }
 
+MainWidget::~MainWidget()
+{
+    IEventManager* eventManager;
+    if (0 == m_ctx->query(QUERY_TYPE::EVENT_MANAGER, (void**)&eventManager)) {
+        eventManager->unregisterEventHandler(EVENT_ID::SWITCH_WIDGET, m_switchWidgetEvent);
+        delete m_switchWidgetEvent;
+    }
+}
+
 void MainWidget::onMessage(QString id, void *pArg)
 {
     int msg = *static_cast<int*>(pArg);
@@ -118,4 +132,12 @@ void MainWidget::onMessage(QString id, const QByteArray &data)
 {
     aDebug() << id;
     aDebug() << QString(data);
+}
+
+void MainWidget::onEvent(Event *e)
+{
+    if (e->id() == EVENT_ID::SWITCH_WIDGET) {
+        aDebug() << "dbg EVENT_ID::SWITCH_WIDGET : " << static_cast<SWITCH_WIDGET_EVENT*>(e->arg())->pluginId;
+        e->next();
+    }
 }

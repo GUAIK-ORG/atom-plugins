@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QMap>
 #include <QSharedPointer>
+#include "ievent.h"
 
 class NetState: public QWidget {
 public:
@@ -41,11 +42,12 @@ private:
     QLabel* m_tag;
 };
 
-class MainWidget : public QWidget, public IMessageHandler
+class MainWidget : public QWidget, public IMessageHandler, public IEventHandler
 {
     Q_OBJECT
 public:
     explicit MainWidget(IContext* ctx, QWidget *parent = nullptr);
+    ~MainWidget();
 
 private:
     IContext* m_ctx;
@@ -53,9 +55,11 @@ private:
     QTimer* m_timer;
     QHBoxLayout* m_netLay;
     QMap<int, QSharedPointer<NetState>> m_netStates;
+    EVENT_OBJ* m_switchWidgetEvent;
 
 protected:
     void onMessage(QString id, void *pArg) override;
+    void onEvent(Event *e) override;
 
 signals:
 

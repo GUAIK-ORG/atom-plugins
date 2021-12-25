@@ -13,6 +13,13 @@ MainWidget::MainWidget(IContext* ctx, QWidget *parent)
     : QWidget(parent)
     , m_ctx(ctx)
 {
+    IEventManager* eventManager;
+    if (0 == m_ctx->query(QUERY_TYPE::EVENT_MANAGER, (void**)&eventManager)) {
+        m_switchWidgetEvent = new EVENT_OBJ(5, this);
+        eventManager->registerEventHandler(EVENT_ID::SWITCH_WIDGET, m_switchWidgetEvent);
+    }
+
+
     this->setAttribute(Qt::WA_StyledBackground, true);
     this->setStyleSheet("background-color:#000000;color:#ffffff");
     this->setFixedHeight(30);
@@ -40,9 +47,25 @@ MainWidget::MainWidget(IContext* ctx, QWidget *parent)
     m_timer->start();
 }
 
+MainWidget::~MainWidget() {
+    IEventManager* eventManager;
+    if (0 == m_ctx->query(QUERY_TYPE::EVENT_MANAGER, (void**)&eventManager)) {
+        eventManager->unregisterEventHandler(EVENT_ID::SWITCH_WIDGET, m_switchWidgetEvent);
+        delete m_switchWidgetEvent;
+    }
+}
+
 void MainWidget::onMessage(QString id, void *pArg)
 {
 
+}
+
+void MainWidget::onEvent(Event *e)
+{
+    if (e->id() == EVENT_ID::SWITCH_WIDGET) {
+        aDebug() << "statusbar EVENT_ID::SWITCH_WIDGET : " << static_cast<SWITCH_WIDGET_EVENT*>(e->arg())->pluginId;
+        e->next();
+    }
 }
 
 void MainWidget::onTimeOut()

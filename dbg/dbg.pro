@@ -47,6 +47,7 @@ HEADERS += \
     imq.h \
     imessage.h \
     istorage.h \
+    ievent.h \
     widgets/mainwidget.h \
 
 DISTFILES += \
